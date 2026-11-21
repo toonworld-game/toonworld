@@ -1,0 +1,62 @@
+name: Toonworld published Windows controls
+'on':
+  push:
+    paths:
+    - .github/workflows/windows-controls.yml
+  workflow_dispatch: null
+permissions:
+  contents: write
+jobs:
+  controls:
+    runs-on: windows-2025
+    timeout-minutes: 15
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '24'
+    - name: Download and install exact published EXE
+      shell: pwsh
+      run: 'New-Item evidence -ItemType Directory -Force
+
+        curl.exe -fL https://github.com/toonworld-game/toonworld/releases/download/v166-windows/toonworld.exe -o toonworld.exe
+
+        if ($LASTEXITCODE -ne 0) {throw ''Download failed''}
+
+        if ((Get-FileHash toonworld.exe -Algorithm SHA256).Hash.ToLower() -ne ''d6cc5ae86e6b44a5084b618ab6bc458a9e60e45d654bb0a6ad93c842802df105'') {throw ''EXE hash mismatch''}
+
+        $p=Start-Process "$PWD/toonworld.exe" -ArgumentList ''/S'',''/currentuser'',''/D=C:\ToonworldTest'' -Wait -PassThru
+
+        if ($p.ExitCode -ne 0) {throw ''Install failed''}
+
+        '
+    - name: Test published app commands without editing game
+      shell: pwsh
+      run: '[IO.File]::WriteAllBytes("$PWD/controls.cjs",[Convert]::FromBase64String(''Y29uc3QgZnM9cmVxdWlyZSgnbm9kZTpmcycpOwpjb25zdCBwYXVzZT1tcz0+bmV3IFByb21pc2Uocj0+c2V0VGltZW91dChyLG1zKSk7Cihhc3luYygpPT57CmxldCBwYWdlOyBmb3IobGV0IGk9MDtpPDkwO2krKyl7dHJ5e3BhZ2U9KGF3YWl0KGF3YWl0IGZldGNoKCdodHRwOi8vMTI3LjAuMC4xOjkyMjIvanNvbicpKS5qc29uKCkpLmZpbmQocD0+cC50eXBlPT09J3BhZ2UnKTtpZihwYWdlKWJyZWFrfWNhdGNoe31hd2FpdCBwYXVzZSgxMDAwKX0KaWYoIXBhZ2UpdGhyb3cgRXJyb3IoJ05vIGRlYnVnIHRhcmdldCcpOwpjb25zdCB3cz1uZXcgV2ViU29ja2V0KHBhZ2Uud2ViU29ja2V0RGVidWdnZXJVcmwpO2F3YWl0IG5ldyBQcm9taXNlKHI9PndzLm9ub3Blbj1yKTtsZXQgc2VxPTA7Y29uc3QgcGVuZGluZz1uZXcgTWFwKCk7d3Mub25tZXNzYWdlPWU9Pntjb25zdCB4PUpTT04ucGFyc2UoZS5kYXRhKTtpZih4LmlkKXtjb25zdCBwPXBlbmRpbmcuZ2V0KHguaWQpO3BlbmRpbmcuZGVsZXRlKHguaWQpO2lmKHguZXJyb3IpcC5yZWplY3QoeC5lcnJvcik7ZWxzZSBwLnJlc29sdmUoeC5yZXN1bHQpfX07CmNvbnN0IGNtZD0obWV0aG9kLHBhcmFtcz17fSk9Pm5ldyBQcm9taXNlKChyZXNvbHZlLHJlamVjdCk9Pntjb25zdCBpZD0rK3NlcTtwZW5kaW5nLnNldChpZCx7cmVzb2x2ZSxyZWplY3R9KTt3cy5zZW5kKEpTT04uc3RyaW5naWZ5KHtpZCxtZXRob2QscGFyYW1zfSkpfSk7CmNvbnN0IGV2PWFzeW5jIGV4cHJlc3Npb249Pntjb25zdCB4PWF3YWl0IGNtZCgnUnVudGltZS5ldmFsdWF0ZScse2V4cHJlc3Npb24scmV0dXJuQnlWYWx1ZTp0cnVlLHVzZXJHZXN0dXJlOnRydWUsYXdhaXRQcm9taXNlOnRydWV9KTtpZih4LmV4Y2VwdGlvbkRldGFpbHMpdGhyb3cgRXJyb3IoSlNPTi5zdHJpbmdpZnkoeC5leGNlcHRpb25EZXRhaWxzKSk7cmV0dXJuIHgucmVzdWx0LnZhbHVlfTsKY29uc3QgdW50aWw9YXN5bmMgZXg9Pntmb3IobGV0IGk9MDtpPDI0MDtpKyspe2lmKGF3YWl0IGV2KGV4KSlyZXR1cm47YXdhaXQgcGF1c2UoMTAwMCl9dGhyb3cgRXJyb3IoJ1RpbWVvdXQgJytleCl9Owpjb25zdCBzaG90PWFzeW5jIG5hbWU9PmZzLndyaXRlRmlsZVN5bmMoJ2V2aWRlbmNlLycrbmFtZSsnLnBuZycsQnVmZmVyLmZyb20oKGF3YWl0IGNtZCgnUGFnZS5jYXB0dXJlU2NyZWVuc2hvdCcse2Zvcm1hdDoncG5nJ30pKS5kYXRhLCdiYXNlNjQnKSk7CmF3YWl0IGNtZCgnUGFnZS5lbmFibGUnKTthd2FpdCBjbWQoJ1J1bnRpbWUuZW5hYmxlJyk7YXdhaXQgY21kKCdQYWdlLmJyaW5nVG9Gcm9udCcpOwphd2FpdCB1bnRpbCgiZG9jdW1lbnQucXVlcnlTZWxlY3RvcignY2FudmFzJykgJiYgZG9jdW1lbnQucXVlcnlTZWxlY3RvcignI2xvYWRpbmcnKT8uY2xhc3NMaXN0LmNvbnRhaW5zKCdoaWRlJykiKTsKYXdhaXQgZXYoIndpbmRvdy5fX2tleXM9W107YWRkRXZlbnRMaXN0ZW5lcigna2V5ZG93bicsZT0+X19rZXlzLnB1c2goe3R5cGU6ZS50eXBlLGNvZGU6ZS5jb2RlLGtleTplLmtleSx0cnVzdGVkOmUuaXNUcnVzdGVkfSksdHJ1ZSk7YWRkRXZlbnRMaXN0ZW5lcigna2V5dXAnLGU9Pl9fa2V5cy5wdXNoKHt0eXBlOmUudHlwZSxjb2RlOmUuY29kZSxrZXk6ZS5rZXksdHJ1c3RlZDplLmlzVHJ1c3RlZH0pLHRydWUpO2RvY3VtZW50LnF1ZXJ5U2VsZWN0b3IoJyNtZW51UGxheScpLmNsaWNrKCkiKTsKYXdhaXQgdW50aWwoImRvY3VtZW50LnF1ZXJ5U2VsZWN0b3IoJyNzdGFydE1lbnUnKT8uaGlkZGVuICYmIGRvY3VtZW50LnF1ZXJ5U2VsZWN0b3IoJyNsb2FkaW5nJyk/LmNsYXNzTGlzdC5jb250YWlucygnaGlkZScpIik7YXdhaXQgcGF1c2UoMjAwMDApOwpjb25zdCByZWN0PWF3YWl0IGV2KCIoKCk9PntsZXQgYz1bLi4uZG9jdW1lbnQucXVlcnlTZWxlY3RvckFsbCgnY2FudmFzJyldLmZpbmQoYz0+Yy5jbGllbnRXaWR0aD41MDApLHI9Yy5nZXRCb3VuZGluZ0NsaWVudFJlY3QoKTtyZXR1cm57eDpyLngrci53aWR0aC8yLHk6ci55K3IuaGVpZ2h0LzJ9fSkoKSIpOwphd2FpdCBjbWQoJ0lucHV0LmRpc3BhdGNoTW91c2VFdmVudCcse3R5cGU6J21vdXNlUHJlc3NlZCcsYnV0dG9uOidsZWZ0JyxjbGlja0NvdW50OjEsLi4ucmVjdH0pO2F3YWl0IGNtZCgnSW5wdXQuZGlzcGF0Y2hNb3VzZUV2ZW50Jyx7dHlwZTonbW91c2VSZWxlYXNlZCcsYnV0dG9uOidsZWZ0JyxjbGlja0NvdW50OjEsLi4ucmVjdH0pO2F3YWl0IHBhdXNlKDE1MDApOwpjb25zdCBrZXk9YXN5bmModHlwZSxrZXksY29kZSxudW0pPT5jbWQoJ0lucHV0LmRpc3BhdGNoS2V5RXZlbnQnLHt0eXBlLGtleSxjb2RlLHdpbmRvd3NWaXJ0dWFsS2V5Q29kZTpudW0sbmF0aXZlVmlydHVhbEtleUNvZGU6bnVtfSk7CmNvbnN0IHN0YXRlPSgpPT5ldigiKHtwb3M6d2Fsa2VyLnBvcy50b0FycmF5KCksdmVsOndhbGtlci52ZWwudG9BcnJheSgpLG1vZGUsbWVudU9wZW4sbG9ja2VkOiEhZG9jdW1lbnQucG9pbnRlckxvY2tFbGVtZW50LGtleXM6dHlwZW9mIGtleXM9PT0nb2JqZWN0Jz9KU09OLnN0cmluZ2lmeShrZXlzKTpudWxsfSkiKTsKY29uc3QgcmVwb3J0PXtpbml0aWFsU3RhdGU6YXdhaXQgc3RhdGUoKSxiZWZvcmU6YXdhaXQgZXYoIih7aHVkOmRvY3VtZW50LnF1ZXJ5U2VsZWN0b3IoJyNodWQnKT8uaW5uZXJUZXh0LHBvaW50ZXJMb2NrOiEhZG9jdW1lbnQucG9pbnRlckxvY2tFbGVtZW50LG1lbnVIaWRkZW46ZG9jdW1lbnQucXVlcnlTZWxlY3RvcignI3N0YXJ0TWVudScpLmhpZGRlbn0pIil9O2F3YWl0IHNob3QoJzAxLWJlZm9yZScpOwphd2FpdCBrZXkoJ2tleURvd24nLCcgJywnU3BhY2UnLDMyKTthd2FpdCBwYXVzZSgxNTApO2F3YWl0IGtleSgna2V5VXAnLCcgJywnU3BhY2UnLDMyKTthd2FpdCBwYXVzZSg3MDApOwphd2FpdCBrZXkoJ2tleURvd24nLCd3JywnS2V5VycsODcpO2F3YWl0IHBhdXNlKDMwMDApO3JlcG9ydC5mb3J3YXJkU3RhdGU9YXdhaXQgc3RhdGUoKTtyZXBvcnQuZm9yd2FyZD1hd2FpdCBldigiZG9jdW1lbnQucXVlcnlTZWxlY3RvcignI2h1ZCcpPy5pbm5lclRleHQiKTthd2FpdCBzaG90KCcwMi1mb3J3YXJkJyk7YXdhaXQga2V5KCdrZXlVcCcsJ3cnLCdLZXlXJyw4Nyk7CmF3YWl0IGtleSgna2V5RG93bicsJ2QnLCdLZXlEJyw2OCk7YXdhaXQgcGF1c2UoMjAwMCk7cmVwb3J0LnJpZ2h0U3RhdGU9YXdhaXQgc3RhdGUoKTtyZXBvcnQucmlnaHQ9YXdhaXQgZXYoImRvY3VtZW50LnF1ZXJ5U2VsZWN0b3IoJyNodWQnKT8uaW5uZXJUZXh0Iik7YXdhaXQgc2hvdCgnMDMtcmlnaHQnKTthd2FpdCBrZXkoJ2tleVVwJywnZCcsJ0tleUQnLDY4KTsKYXdhaXQga2V5KCdrZXlEb3duJywnRXNjYXBlJywnRXNjYXBlJywyNyk7YXdhaXQga2V5KCdrZXlVcCcsJ0VzY2FwZScsJ0VzY2FwZScsMjcpO2F3YWl0IHBhdXNlKDEyMDApO3JlcG9ydC5lc2NhcGUxPWF3YWl0IGV2KCIoe21lbnVIaWRkZW46ZG9jdW1lbnQucXVlcnlTZWxlY3RvcignI3N0YXJ0TWVudScpLmhpZGRlbixwb2ludGVyTG9jazohIWRvY3VtZW50LnBvaW50ZXJMb2NrRWxlbWVudH0pIik7YXdhaXQgc2hvdCgnMDQtZXNjYXBlMScpOwphd2FpdCBrZXkoJ2tleURvd24nLCdFc2NhcGUnLCdFc2NhcGUnLDI3KTthd2FpdCBrZXkoJ2tleVVwJywnRXNjYXBlJywnRXNjYXBlJywyNyk7YXdhaXQgcGF1c2UoMTIwMCk7cmVwb3J0LmVzY2FwZTI9YXdhaXQgZXYoIih7bWVudUhpZGRlbjpkb2N1bWVudC5xdWVyeVNlbGVjdG9yKCcjc3RhcnRNZW51JykuaGlkZGVuLHBvaW50ZXJMb2NrOiEhZG9jdW1lbnQucG9pbnRlckxvY2tFbGVtZW50fSkiKTthd2FpdCBzaG90KCcwNS1lc2NhcGUyJyk7CnJlcG9ydC5zdG9yYWdlTm9ybWFsTGF1bmNoPWF3YWl0IGV2KCJsb2NhbFN0b3JhZ2UuZ2V0SXRlbSgndG9vbndvcmxkX3dpbmRvd3Nfc21va2UnKSIpO3JlcG9ydC5maW5hbFN0YXRlPWF3YWl0IHN0YXRlKCk7cmVwb3J0LmV2ZW50cz1hd2FpdCBldignd2luZG93Ll9fa2V5cycpO2ZzLndyaXRlRmlsZVN5bmMoJ2V2aWRlbmNlL2NvbnRyb2xzLmpzb24nLEpTT04uc3RyaW5naWZ5KHJlcG9ydCxudWxsLDIpKTtjb25zb2xlLmxvZyhKU09OLnN0cmluZ2lmeShyZXBvcnQpKTt3cy5jbG9zZSgpO3Byb2Nlc3MuZXhpdCgwKTsKfSkoKS5jYXRjaChlPT57ZnMud3JpdGVGaWxlU3luYygnZXZpZGVuY2UvZmFpbHVyZS50eHQnLFN0cmluZyhlKSk7Y29uc29sZS5lcnJvcihlKTtwcm9jZXNzLmV4aXQoMSl9KTsK''))
+
+        $p=Start-Process ''C:\ToonworldTest\Toonworld.exe'' -ArgumentList ''--remote-debugging-port=9222'' -PassThru
+
+        node controls.cjs
+
+        if ($LASTEXITCODE -ne 0) {throw ''Control test failed''}
+
+        Stop-Process -Id $p.Id -Force -ErrorAction SilentlyContinue
+
+        '
+    - name: Upload controls evidence
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: Windows-published-controls
+        path: evidence/
+        retention-days: 7
+    - name: Attach controls evidence to release
+      if: always()
+      env:
+        GH_TOKEN: ${{ github.token }}
+      shell: pwsh
+      run: 'Compress-Archive -Path evidence/* -DestinationPath Windows-controls.zip
+
+        gh release upload v166-windows Windows-controls.zip --clobber
+
+        '
