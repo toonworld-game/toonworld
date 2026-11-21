@@ -1,0 +1,102 @@
+name: Toonworld Windows V166
+'on':
+  push:
+    paths:
+    - .github/workflows/windows-v166.yml
+  workflow_dispatch: null
+permissions:
+  contents: write
+jobs:
+  build-install-test:
+    runs-on: windows-2025
+    timeout-minutes: 30
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: '24'
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+    - name: Prepare Windows packaging
+      shell: python
+      run: 'import pathlib,base64
+
+        p=pathlib.Path(''app/main.cjs'');p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(base64.b64decode(''Y29uc3Qge2FwcCwgQnJvd3NlcldpbmRvdywgTWVudSwgZGlhbG9nfSA9IHJlcXVpcmUoJ2VsZWN0cm9uJyk7CmNvbnN0IHBhdGggPSByZXF1aXJlKCdub2RlOnBhdGgnKTsKY29uc3QgZnMgPSByZXF1aXJlKCdub2RlOmZzJyk7CmNvbnN0IHNtb2tlQXJnID0gcHJvY2Vzcy5hcmd2LmZpbmQoeCA9PiB4LnN0YXJ0c1dpdGgoJy0tdG9vbndvcmxkLXNtb2tlPScpKTsKY29uc3Qgc21va2VEaXIgPSBzbW9rZUFyZyAmJiBzbW9rZUFyZy5zbGljZSgnLS10b29ud29ybGQtc21va2U9Jy5sZW5ndGgpOwphcHAuc2V0TmFtZSgnVG9vbndvcmxkJyk7CmxldCB3aW47CmNvbnN0IGVycm9ycz1bXTsKY29uc3Qgc2xlZXA9bXM9Pm5ldyBQcm9taXNlKHI9PnNldFRpbWVvdXQocixtcykpOwphc3luYyBmdW5jdGlvbiB1bnRpbChzY3JpcHQsIHRpbWVvdXQ9MTgwMDAwKSB7CiAgY29uc3QgZW5kPURhdGUubm93KCkrdGltZW91dDsKICB3aGlsZShEYXRlLm5vdygpPGVuZCkgewogICAgaWYod2luLmlzRGVzdHJveWVkKCkpIHRocm93IEVycm9yKCdXaW5kb3cgY2xvc2VkJyk7CiAgICB0cnkge2lmKGF3YWl0IHdpbi53ZWJDb250ZW50cy5leGVjdXRlSmF2YVNjcmlwdChzY3JpcHQpKSByZXR1cm47fWNhdGNoe30KICAgIGF3YWl0IHNsZWVwKDEwMDApOwogIH0KICB0aHJvdyBFcnJvcignVGltZWQgb3V0OiAnK3NjcmlwdCk7Cn0KYXN5bmMgZnVuY3Rpb24gc21va2UoKSB7CiAgZnMubWtkaXJTeW5jKHNtb2tlRGlyLHtyZWN1cnNpdmU6dHJ1ZX0pOwogIHRyeSB7CiAgICBhd2FpdCB1bnRpbCgiZG9jdW1lbnQucXVlcnlTZWxlY3RvcignY2FudmFzJykgJiYgZG9jdW1lbnQucXVlcnlTZWxlY3RvcignI2xvYWRpbmcnKT8uY2xhc3NMaXN0LmNvbnRhaW5zKCdoaWRlJykiKTsKICAgIGF3YWl0IHNsZWVwKDMwMDApOwogICAgZnMud3JpdGVGaWxlU3luYyhwYXRoLmpvaW4oc21va2VEaXIsJzAxLW1lbnUucG5nJyksKGF3YWl0IHdpbi53ZWJDb250ZW50cy5jYXB0dXJlUGFnZSgpKS50b1BORygpKTsKICAgIGF3YWl0IHdpbi53ZWJDb250ZW50cy5leGVjdXRlSmF2YVNjcmlwdCgibG9jYWxTdG9yYWdlLnNldEl0ZW0oJ3Rvb253b3JsZF93aW5kb3dzX3Ntb2tlJywnb2snKTsgZG9jdW1lbnQucXVlcnlTZWxlY3RvcignI21lbnVQbGF5JykuY2xpY2soKSIsdHJ1ZSk7CiAgICBhd2FpdCB1bnRpbCgiZG9jdW1lbnQucXVlcnlTZWxlY3RvcignI3N0YXJ0TWVudScpPy5oaWRkZW4gJiYgZG9jdW1lbnQucXVlcnlTZWxlY3RvcignI2xvYWRpbmcnKT8uY2xhc3NMaXN0LmNvbnRhaW5zKCdoaWRlJykiLDI0MDAwMCk7CiAgICBhd2FpdCBzbGVlcCgxNTAwMCk7CiAgICBmcy53cml0ZUZpbGVTeW5jKHBhdGguam9pbihzbW9rZURpciwnMDItZ2FtZS5wbmcnKSwoYXdhaXQgd2luLndlYkNvbnRlbnRzLmNhcHR1cmVQYWdlKCkpLnRvUE5HKCkpOwogICAgY29uc3QgcmVwb3J0PWF3YWl0IHdpbi53ZWJDb250ZW50cy5leGVjdXRlSmF2YVNjcmlwdChgKHt0aXRsZTpkb2N1bWVudC50aXRsZSxjYW52YXM6Wy4uLmRvY3VtZW50LnF1ZXJ5U2VsZWN0b3JBbGwoJ2NhbnZhcycpXS5tYXAoYz0+KHt3aWR0aDpjLndpZHRoLGhlaWdodDpjLmhlaWdodH0pKSxtZW51SGlkZGVuOmRvY3VtZW50LnF1ZXJ5U2VsZWN0b3IoJyNzdGFydE1lbnUnKS5oaWRkZW4sbG9hZGluZ0hpZGRlbjpkb2N1bWVudC5xdWVyeVNlbGVjdG9yKCcjbG9hZGluZycpLmNsYXNzTGlzdC5jb250YWlucygnaGlkZScpLHN0b3JhZ2U6bG9jYWxTdG9yYWdlLmdldEl0ZW0oJ3Rvb253b3JsZF93aW5kb3dzX3Ntb2tlJyl9KWApOwogICAgY29uc3QgY2FudmFzUmVjdD1hd2FpdCB3aW4ud2ViQ29udGVudHMuZXhlY3V0ZUphdmFTY3JpcHQoIigoKT0+e2NvbnN0IGM9Wy4uLmRvY3VtZW50LnF1ZXJ5U2VsZWN0b3JBbGwoJ2NhbnZhcycpXS5maW5kKGM9PmMuY2xpZW50V2lkdGg+NTAwKTsgY29uc3Qgcj1jLmdldEJvdW5kaW5nQ2xpZW50UmVjdCgpO3JldHVybiB7eDpNYXRoLnJvdW5kKHIueCtyLndpZHRoLzIpLHk6TWF0aC5yb3VuZChyLnkrci5oZWlnaHQvMil9fSkoKSIpOwogICAgd2luLndlYkNvbnRlbnRzLnNlbmRJbnB1dEV2ZW50KHt0eXBlOidtb3VzZURvd24nLGJ1dHRvbjonbGVmdCcsY2xpY2tDb3VudDoxLC4uLmNhbnZhc1JlY3R9KTsKICAgIHdpbi53ZWJDb250ZW50cy5zZW5kSW5wdXRFdmVudCh7dHlwZTonbW91c2VVcCcsYnV0dG9uOidsZWZ0JyxjbGlja0NvdW50OjEsLi4uY2FudmFzUmVjdH0pOwogICAgYXdhaXQgc2xlZXAoMTUwMCk7CiAgICByZXBvcnQucG9pbnRlckxvY2s9YXdhaXQgd2luLndlYkNvbnRlbnRzLmV4ZWN1dGVKYXZhU2NyaXB0KCchIWRvY3VtZW50LnBvaW50ZXJMb2NrRWxlbWVudCcpOwogICAgd2luLndlYkNvbnRlbnRzLnNlbmRJbnB1dEV2ZW50KHt0eXBlOidrZXlEb3duJyxrZXlDb2RlOidXJ30pOwogICAgYXdhaXQgc2xlZXAoMjAwMCk7CiAgICBmcy53cml0ZUZpbGVTeW5jKHBhdGguam9pbihzbW9rZURpciwnMDUta2V5Ym9hcmQtbW92ZW1lbnQucG5nJyksKGF3YWl0IHdpbi53ZWJDb250ZW50cy5jYXB0dXJlUGFnZSgpKS50b1BORygpKTsKICAgIHJlcG9ydC5odWRBZnRlck1vdmVtZW50PWF3YWl0IHdpbi53ZWJDb250ZW50cy5leGVjdXRlSmF2YVNjcmlwdCgiZG9jdW1lbnQucXVlcnlTZWxlY3RvcignI2h1ZCcpPy5pbm5lclRleHQiKTsKICAgIHdpbi53ZWJDb250ZW50cy5zZW5kSW5wdXRFdmVudCh7dHlwZTona2V5VXAnLGtleUNvZGU6J1cnfSk7CiAgICB3aW4ud2ViQ29udGVudHMuc2VuZElucHV0RXZlbnQoe3R5cGU6J2tleURvd24nLGtleUNvZGU6J0VTQyd9KTsKICAgIHdpbi53ZWJDb250ZW50cy5zZW5kSW5wdXRFdmVudCh7dHlwZTona2V5VXAnLGtleUNvZGU6J0VTQyd9KTsKICAgIGF3YWl0IHNsZWVwKDEwMDApOwogICAgcmVwb3J0LmVzY2FwZU1lbnU9YXdhaXQgd2luLndlYkNvbnRlbnRzLmV4ZWN1dGVKYXZhU2NyaXB0KCIhZG9jdW1lbnQucXVlcnlTZWxlY3RvcignI3N0YXJ0TWVudScpLmhpZGRlbiIpOwogICAgZnMud3JpdGVGaWxlU3luYyhwYXRoLmpvaW4oc21va2VEaXIsJzA2LWVzY2FwZS1tZW51LnBuZycpLChhd2FpdCB3aW4ud2ViQ29udGVudHMuY2FwdHVyZVBhZ2UoKSkudG9QTkcoKSk7CiAgICByZXBvcnQuc3RvcmFnZVBhdGg9YXBwLmdldFBhdGgoJ3VzZXJEYXRhJyk7CiAgICByZXBvcnQucGxhdGZvcm09cHJvY2Vzcy5wbGF0Zm9ybTsgcmVwb3J0LmFyY2g9cHJvY2Vzcy5hcmNoOyByZXBvcnQuZWxlY3Ryb249cHJvY2Vzcy52ZXJzaW9ucy5lbGVjdHJvbjsgcmVwb3J0LmVycm9ycz1lcnJvcnM7IHJlcG9ydC5ncHU9YXdhaXQgYXBwLmdldEdQVUluZm8oJ2Jhc2ljJyk7IHJlcG9ydC50ZXN0UmVuZGVyZXI9J0RlZmF1bHQgV2luZG93cyByZW5kZXJlciBvbiBob3N0ZWQgcnVubmVyJzsKICAgIGZzLndyaXRlRmlsZVN5bmMocGF0aC5qb2luKHNtb2tlRGlyLCdzbW9rZS5qc29uJyksSlNPTi5zdHJpbmdpZnkocmVwb3J0LG51bGwsMikpOwogICAgaWYocmVwb3J0LnN0b3JhZ2UhPT0nb2snfHwhcmVwb3J0Lm1lbnVIaWRkZW58fCFyZXBvcnQuY2FudmFzLnNvbWUoYz0+Yy53aWR0aD4wJiZjLmhlaWdodD4wKXx8ZXJyb3JzLmxlbmd0aCkgdGhyb3cgRXJyb3IoJ1Ntb2tlIHZhbGlkYXRpb24gZmFpbGVkJyk7CiAgICBhcHAuZXhpdCgwKTsKICB9Y2F0Y2goZSl7CiAgICBmcy53cml0ZUZpbGVTeW5jKHBhdGguam9pbihzbW9rZURpciwnZmFpbHVyZS5qc29uJyksSlNPTi5zdHJpbmdpZnkoe2Vycm9yOlN0cmluZyhlKSxlcnJvcnN9LG51bGwsMikpOwogICAgaWYod2luJiYhd2luLmlzRGVzdHJveWVkKCkpZnMud3JpdGVGaWxlU3luYyhwYXRoLmpvaW4oc21va2VEaXIsJ2ZhaWx1cmUucG5nJyksKGF3YWl0IHdpbi53ZWJDb250ZW50cy5jYXB0dXJlUGFnZSgpKS50b1BORygpKTsKICAgIGFwcC5leGl0KDEpOwogIH0KfQpmdW5jdGlvbiBjcmVhdGVXaW5kb3coKXsKICB3aW49bmV3IEJyb3dzZXJXaW5kb3coe3dpZHRoOjE0NDAsaGVpZ2h0OjkwMCxtaW5XaWR0aDo5NjAsbWluSGVpZ2h0OjY0MCxiYWNrZ3JvdW5kQ29sb3I6JyMxNDBjMmMnLHRpdGxlOidUb29ud29ybGQnLGljb246cGF0aC5qb2luKF9fZGlybmFtZSwnaWNvbi5wbmcnKSxzaG93OmZhbHNlLHdlYlByZWZlcmVuY2VzOntub2RlSW50ZWdyYXRpb246ZmFsc2UsY29udGV4dElzb2xhdGlvbjp0cnVlLHNhbmRib3g6dHJ1ZSx3ZWJTZWN1cml0eTp0cnVlfX0pOwogIHdpbi5vbmNlKCdyZWFkeS10by1zaG93JywoKT0+d2luLnNob3coKSk7CiAgd2luLndlYkNvbnRlbnRzLnNldFdpbmRvd09wZW5IYW5kbGVyKCgpPT4oe2FjdGlvbjonZGVueSd9KSk7CiAgd2luLndlYkNvbnRlbnRzLm9uKCd3aWxsLW5hdmlnYXRlJywoZXZlbnQsdXJsKT0+e2lmKCF1cmwuc3RhcnRzV2l0aCgnZmlsZTovLycpKWV2ZW50LnByZXZlbnREZWZhdWx0KCk7fSk7CiAgd2luLndlYkNvbnRlbnRzLnNlc3Npb24uc2V0UGVybWlzc2lvblJlcXVlc3RIYW5kbGVyKChjb250ZW50cyxwZXJtaXNzaW9uLGNhbGxiYWNrKT0+Y2FsbGJhY2socGVybWlzc2lvbj09PSdwb2ludGVyTG9jayd8fHBlcm1pc3Npb249PT0nZnVsbHNjcmVlbicpKTsKICB3aW4ud2ViQ29udGVudHMub24oJ3JlbmRlci1wcm9jZXNzLWdvbmUnLChfLGRldGFpbHMpPT57ZXJyb3JzLnB1c2goe3R5cGU6J3JlbmRlcmVyLWdvbmUnLHJlYXNvbjpkZXRhaWxzLnJlYXNvbn0pO2lmKCFzbW9rZURpcilkaWFsb2cuc2hvd0Vycm9yQm94KCdUb29ud29ybGQnLCdMZSBtb3RldXIgZHUgamV1IGEgw6l0w6kgaW50ZXJyb21wdS4gUmVsYW5jZXogVG9vbndvcmxkLicpO30pOwogIHdpbi53ZWJDb250ZW50cy5vbignY29uc29sZS1tZXNzYWdlJywoZGV0YWlscyk9PntpZihkZXRhaWxzLmxldmVsPT09J2Vycm9yJyllcnJvcnMucHVzaCh7dHlwZTonY29uc29sZScsbWVzc2FnZTpkZXRhaWxzLm1lc3NhZ2V9KTt9KTsKICB3aW4ud2ViQ29udGVudHMub24oJ2RpZC1mYWlsLWxvYWQnLChfLGNvZGUsZGVzY3JpcHRpb24pPT57ZXJyb3JzLnB1c2goe3R5cGU6J2xvYWQnLGNvZGUsZGVzY3JpcHRpb259KTt9KTsKICB3aW4ud2ViQ29udGVudHMub24oJ2RpZC1maW5pc2gtbG9hZCcsKCk9PntpZihzbW9rZURpcilzbW9rZSgpO30pOwogIHdpbi5sb2FkRmlsZShwYXRoLmpvaW4oX19kaXJuYW1lLCd0b29ud29ybGQuaHRtbCcpKTsKfQphcHAud2hlblJlYWR5KCkudGhlbigoKT0+ewogIE1lbnUuc2V0QXBwbGljYXRpb25NZW51KE1lbnUuYnVpbGRGcm9tVGVtcGxhdGUoW3tsYWJlbDonVG9vbndvcmxkJyxzdWJtZW51Olt7cm9sZToncXVpdCcsbGFiZWw6J1F1aXR0ZXIgVG9vbndvcmxkJ31dfSx7bGFiZWw6J0FmZmljaGFnZScsc3VibWVudTpbe3JvbGU6J3RvZ2dsZWZ1bGxzY3JlZW4nLGxhYmVsOidQbGVpbiDDqWNyYW4nfV19XSkpOwogIGNyZWF0ZVdpbmRvdygpOwogIGFwcC5vbignYWN0aXZhdGUnLCgpPT57aWYoQnJvd3NlcldpbmRvdy5nZXRBbGxXaW5kb3dzKCkubGVuZ3RoPT09MCljcmVhdGVXaW5kb3coKTt9KTsKfSk7CmFwcC5vbignd2luZG93LWFsbC1jbG9zZWQnLCgpPT57aWYocHJvY2Vzcy5wbGF0Zm9ybSE9PSdkYXJ3aW4nKWFwcC5xdWl0KCk7fSk7Cg==''))
+
+        p=pathlib.Path(''package.json'');p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(base64.b64decode(''ewogICJuYW1lIjogInRvb253b3JsZC13aW5kb3dzIiwKICAidmVyc2lvbiI6ICIxNjYuMC4wIiwKICAiZGVzY3JpcHRpb24iOiAiVG9vbndvcmxkIHBvdXIgV2luZG93cyIsCiAgImF1dGhvciI6ICJUb29ud29ybGQiLAogICJwcml2YXRlIjogdHJ1ZSwKICAibWFpbiI6ICJhcHAvbWFpbi5janMiLAogICJkZXZEZXBlbmRlbmNpZXMiOiB7CiAgICAiZWxlY3Ryb24iOiAiNDUuNC4xIiwKICAgICJlbGVjdHJvbi1idWlsZGVyIjogIjI2LjE4LjAiCiAgfSwKICAiYnVpbGQiOiB7CiAgICAiYXBwSWQiOiAiZ2FtZS50b29ud29ybGQuZGVza3RvcCIsCiAgICAicHJvZHVjdE5hbWUiOiAiVG9vbndvcmxkIiwKICAgICJjb3B5cmlnaHQiOiAiVG9vbndvcmxkIiwKICAgICJhc2FyIjogdHJ1ZSwKICAgICJmaWxlcyI6IFsKICAgICAgImFwcC8qKiIKICAgIF0sCiAgICAiZGlyZWN0b3JpZXMiOiB7CiAgICAgICJvdXRwdXQiOiAiZGlzdCIsCiAgICAgICJidWlsZFJlc291cmNlcyI6ICJhc3NldHMiCiAgICB9LAogICAgImFydGlmYWN0TmFtZSI6ICJ0b29ud29ybGQuJHtleHR9IiwKICAgICJ3aW4iOiB7CiAgICAgICJ0YXJnZXQiOiBbCiAgICAgICAgewogICAgICAgICAgInRhcmdldCI6ICJuc2lzIiwKICAgICAgICAgICJhcmNoIjogWwogICAgICAgICAgICAieDY0IgogICAgICAgICAgXQogICAgICAgIH0KICAgICAgXSwKICAgICAgImljb24iOiAiYXNzZXRzL2ljb24uaWNvIiwKICAgICAgInNpZ25BbmRFZGl0RXhlY3V0YWJsZSI6IHRydWUsCiAgICAgICJzaWdudG9vbE9wdGlvbnMiOiB7CiAgICAgICAgInNpZ25pbmdIYXNoQWxnb3JpdGhtcyI6IFsKICAgICAgICAgICJzaGEyNTYiCiAgICAgICAgXQogICAgICB9CiAgICB9LAogICAgIm5zaXMiOiB7CiAgICAgICJvbmVDbGljayI6IGZhbHNlLAogICAgICAicGVyTWFjaGluZSI6IGZhbHNlLAogICAgICAiYWxsb3dFbGV2YXRpb24iOiBmYWxzZSwKICAgICAgImFsbG93VG9DaGFuZ2VJbnN0YWxsYXRpb25EaXJlY3RvcnkiOiB0cnVlLAogICAgICAiY3JlYXRlRGVza3RvcFNob3J0Y3V0IjogdHJ1ZSwKICAgICAgImNyZWF0ZVN0YXJ0TWVudVNob3J0Y3V0IjogdHJ1ZSwKICAgICAgInNob3J0Y3V0TmFtZSI6ICJUb29ud29ybGQiLAogICAgICAiaW5zdGFsbGVyTGFuZ3VhZ2VzIjogWwogICAgICAgICJmcl9GUiIKICAgICAgXSwKICAgICAgImRpc3BsYXlMYW5ndWFnZVNlbGVjdG9yIjogZmFsc2UsCiAgICAgICJpbnN0YWxsZXJJY29uIjogImFzc2V0cy9pY29uLmljbyIsCiAgICAgICJ1bmluc3RhbGxlckljb24iOiAiYXNzZXRzL2ljb24uaWNvIiwKICAgICAgImluc3RhbGxlclNpZGViYXIiOiAiYXNzZXRzL3NpZGViYXIuYm1wIiwKICAgICAgInVuaW5zdGFsbGVyU2lkZWJhciI6ICJhc3NldHMvc2lkZWJhci5ibXAiLAogICAgICAiaW5zdGFsbGVySGVhZGVyIjogImFzc2V0cy9oZWFkZXIuYm1wIiwKICAgICAgImRlbGV0ZUFwcERhdGFPblVuaW5zdGFsbCI6IGZhbHNlLAogICAgICAicnVuQWZ0ZXJGaW5pc2giOiBmYWxzZQogICAgfQogIH0KfQ==''))
+
+        p=pathlib.Path(''make-assets.py'');p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(base64.b64decode(''ZnJvbSBQSUwgaW1wb3J0IEltYWdlLCBJbWFnZURyYXcsIEltYWdlRm9udApmcm9tIHBhdGhsaWIgaW1wb3J0IFBhdGgKcD1QYXRoKCdhc3NldHMnKTtwLm1rZGlyKGV4aXN0X29rPVRydWUpCmltPUltYWdlLm9wZW4oJ2xvZ28ucG5nJykuY29udmVydCgnUkdCQScpCmltLnNhdmUocC8naWNvbi5pY28nLHNpemVzPVsoMTYsMTYpLCgyNCwyNCksKDMyLDMyKSwoNDgsNDgpLCg2NCw2NCksKDEyOCwxMjgpLCgyNTYsMjU2KV0pCmltLnNhdmUoJ2FwcC9pY29uLnBuZycpCmJnPUltYWdlLm5ldygnUkdCJywoMzI4LDYyOCkpO2Q9SW1hZ2VEcmF3LkRyYXcoYmcpCmZvciB5IGluIHJhbmdlKDYyOCk6CiB0PXkvNjI3O2QubGluZSgoMCx5LDMyOCx5KSxmaWxsPXR1cGxlKHJvdW5kKGEqKDEtdCkrYip0KSBmb3IgYSxiIGluIHppcCgoMjAsNTYsNzYpLCg4LDE4LDMwKSkpKQpmb3IgeCx3LGggaW4gWygwLDU0LDExNSksKDYyLDQ1LDE4MCksKDExNiw0MCwxMzApLCgxNjYsNTIsMjE1KSwoMjI4LDQyLDE1NSksKDI4MCw0OCwxOTUpXToKIGQucmVjdGFuZ2xlKCh4LDYyOC1oLHgrdyw2MzApLG91dGxpbmU9JyMzNjUyNjgnLHdpZHRoPTIpCmljb249aW0ucmVzaXplKCgyMjgsMjI4KSxJbWFnZS5SZXNhbXBsaW5nLkxBTkNaT1MpO2JnLnBhc3RlKGljb24sKDUwLDY1KSxpY29uKQpmPUltYWdlRm9udC50cnVldHlwZSgnQzovV2luZG93cy9Gb250cy9nZW9yZ2lhLnR0ZicsMzIpCnM9SW1hZ2VGb250LnRydWV0eXBlKCdDOi9XaW5kb3dzL0ZvbnRzL2FyaWFsLnR0ZicsMjEpCmZvciB0ZXh0LHksZm9udCxmaWxsIGluIFsoJ1Rvb253b3JsZCcsMzMwLGYsJyNmZmYzZTYnKSwoJ0luc3RhbGxhdGlvbicsMzg1LHMsJyNiZmNjZGEnKSwoJ1dpbmRvd3MgwrcgVjE2NicsNDIxLHMsJyNiZmNjZGEnKV06CiBib3g9ZC50ZXh0YmJveCgoMCwwKSx0ZXh0LGZvbnQ9Zm9udCk7ZC50ZXh0KCgoMzI4LWJveFsyXSkvMix5KSx0ZXh0LGZvbnQ9Zm9udCxmaWxsPWZpbGwpCmJnLnJlc2l6ZSgoMTY0LDMxNCksSW1hZ2UuUmVzYW1wbGluZy5MQU5DWk9TKS5zYXZlKHAvJ3NpZGViYXIuYm1wJykKaD1JbWFnZS5uZXcoJ1JHQicsKDE1MCw1NyksJ3doaXRlJyk7aWM9aW0ucmVzaXplKCg1Miw1MiksSW1hZ2UuUmVzYW1wbGluZy5MQU5DWk9TKTtoLnBhc3RlKGljLCg5NCwyKSxpYyk7aC5zYXZlKHAvJ2hlYWRlci5ibXAnKQo=''))
+
+        p=pathlib.Path(''LISEZ-MOI.txt'');p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(base64.b64decode(''VG9vbndvcmxkIFYxNjYgcG91ciBXaW5kb3dzCgpXaW5kb3dzIDEwLzExLCBwcm9jZXNzZXVyIHg2NCAoSW50ZWwgb3UgQU1EIDY0IGJpdHMpLgpUw6lsw6ljaGFyZ2V6IHRvb253b3JsZC5leGUsIG91dnJlei1sZSBldCBzdWl2ZXogbOKAmWluc3RhbGxhdGlvbiBlbiBmcmFuw6dhaXMuCkzigJlpbnN0YWxsYXRpb24gZXN0IHByb3Bvc8OpZSBwb3VyIHZvdHJlIGNvbXB0ZSwgc2FucyBkcm9pdHMgYWRtaW5pc3RyYXRldXIuCkxhbmNleiBlbnN1aXRlIFRvb253b3JsZCBkZXB1aXMgbGUgQnVyZWF1IG91IGxlIG1lbnUgRMOpbWFycmVyLgoKQ2UgZmljaGllciBu4oCZZXN0IHBhcyBzaWduw6kgYXZlYyB1biBjZXJ0aWZpY2F0IGTigJnDqWRpdGV1ci4gV2luZG93cyBvdSB2b3RyZSBhbnRpdmlydXMgcGV1dCBhZmZpY2hlciB1bmUgYWxlcnRlIG91IGJsb3F1ZXIgc29uIG91dmVydHVyZS4gTmUgZMOpc2FjdGl2ZXogcGFzIGdsb2JhbGVtZW50IGxlcyBwcm90ZWN0aW9ucyBkdSBQQy4gTGVzIGFsZXJ0ZXMgZXhhY3RlcyB2YXJpZW50IHNlbG9uIGxhIGNvbmZpZ3VyYXRpb24uCgpVbmUgY29ubmV4aW9uIEludGVybmV0IGVzdCBuw6ljZXNzYWlyZSBwb3VyIGNoYXJnZXIgVGhyZWUuanMgZXQgbGVzIHBvbGljZXMgZHUgamV1LiBMZXMgc2F1dmVnYXJkZXMgcmVzdGVudCBsb2NhbGVzIGF1eCBkb25uw6llcyBkZSBUb29ud29ybGQuCgpMZSBqZXUgZXN0IGV4YWN0ZW1lbnQgbGEgVjE2NiBwdWJsaXF1ZSDDoCBjb21tZW50YWlyZXMgYW5vbnltaXPDqXMsIGNvbW1lIHN1ciBNYWMuIElsIG5lIGNvbnRpZW50IHBhcyBsYSBWMTY3LjMgZW4gY291cnMsIG5pIHNhIGZ1dHVyZSBjb3JyZWN0aW9uIMOJY2hhcC4K''))
+
+        '
+    - name: Fetch pinned game and approved logo
+      shell: pwsh
+      run: 'New-Item evidence -ItemType Directory -Force
+
+        curl.exe --fail --location --retry 2 https://github.com/toonworld-game/toonworld/releases/download/v166/toonworld.html -o app/toonworld.html
+
+        if ($LASTEXITCODE -ne 0) { throw ''Game download failed'' }
+
+        if ((Get-FileHash app/toonworld.html -Algorithm SHA256).Hash.ToLower() -ne ''26f9f0a60ac73f575014a52eb16421f591f8653a0b964a7651d9ee449026635f'') { throw ''Game hash mismatch'' }
+
+        curl.exe --fail --location --retry 2 https://github.com/toonworld-game/toonworld/releases/download/v166-macos-2/Toonworld-logo.png -o logo.png
+
+        if ($LASTEXITCODE -ne 0) { throw ''Logo download failed'' }
+
+        if ((Get-FileHash logo.png -Algorithm SHA256).Hash.ToLower() -ne ''91d991daff7d75d511ed99586fd2b85497ad0e3d6652d9f46987e10f99addec4'') { throw ''Logo hash mismatch'' }
+
+        '
+    - name: Create Windows icon and installer artwork
+      run: 'python -m pip install pillow==12.0.0
+
+        python make-assets.py'
+    - name: Build real x64 Windows installer
+      env:
+        CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      run: 'npm install --no-audit --no-fund
+
+        npx electron-builder --win nsis --x64 --publish never'
+    - name: Observe installer, install and launch real EXE
+      shell: pwsh
+      run: "Add-Type -AssemblyName System.Windows.Forms\nAdd-Type -AssemblyName System.Drawing\nfunction Screenshot($name) {\n $bounds=[System.Windows.Forms.Screen]::PrimaryScreen.Bounds\n $bmp=New-Object System.Drawing.Bitmap($bounds.Width,$bounds.Height)\n $g=[System.Drawing.Graphics]::FromImage($bmp)\n $g.CopyFromScreen($bounds.Location,[System.Drawing.Point]::Empty,$bounds.Size)\n $bmp.Save((Join-Path $PWD \"evidence/$name\"))\n $g.Dispose();$bmp.Dispose()\n}\n$p=Start-Process \"$PWD/dist/toonworld.exe\" -PassThru\nStart-Sleep 8\nScreenshot '00-installer.png'\nStop-Process -Id $p.Id -Force -ErrorAction SilentlyContinue\nGet-Process | Where-Object {$_.ProcessName -like '*toonworld*' -or $_.ProcessName -like '*ns*tmp*'} | Stop-Process -Force -ErrorAction SilentlyContinue\nStart-Sleep 2\n$p=Start-Process \"$PWD/dist/toonworld.exe\" -ArgumentList '/S','/currentuser','/D=C:\\ToonworldTest' -Wait -PassThru\nif ($p.ExitCode -ne 0) { throw \"Installer exit $($p.ExitCode)\" }\nif (!(Test-Path 'C:\\ToonworldTest\\Toonworld.exe')) { throw 'Installed app missing' }\nGet-AuthenticodeSignature dist/toonworld.exe | Select-Object Status,StatusMessage | ConvertTo-Json | Out-File evidence/signature.json\nGet-ComputerInfo | Select-Object WindowsProductName,WindowsVersion,OsArchitecture | ConvertTo-Json | Out-File evidence/windows.json\nGet-ChildItem \"$env:USERPROFILE/Desktop\",\"$env:APPDATA/Microsoft/Windows/Start Menu/Programs\" -Recurse -Filter '*Toonworld*' | Select-Object Name,FullName | ConvertTo-Json | Out-File evidence/shortcuts.json\n$p=Start-Process 'C:\\ToonworldTest\\Toonworld.exe' -ArgumentList \"--toonworld-smoke=$PWD/evidence\" -PassThru\nif (!$p.WaitForExit(360000)) { Stop-Process -Id $p.Id -Force; throw 'Installed app test timeout' }\nif ($p.ExitCode -ne 0) { throw \"Installed app exit $($p.ExitCode)\" }\nGet-Content evidence/smoke.json\n"
+    - name: Verify installed game bytes
+      shell: pwsh
+      run: '@''
+
+        const asar=require(''@electron/asar''),fs=require(''fs''),crypto=require(''crypto'');
+
+        const b=asar.extractFile(''C:/ToonworldTest/resources/app.asar'',''app/toonworld.html'');
+
+        const h=crypto.createHash(''sha256'').update(b).digest(''hex'');
+
+        if(h!==''26f9f0a60ac73f575014a52eb16421f591f8653a0b964a7651d9ee449026635f'')throw Error(''Bundled source changed'');
+
+        fs.writeFileSync(''evidence/bundled-source.txt'',h+'' ''+b.length+'' bytes\n'');
+
+        ''@ | node
+
+        '
+    - name: Upload Windows verification evidence
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: Windows-V166-verification
+        path: evidence/
+        retention-days: 7
+    - name: Publish tested Windows installer
+      env:
+        GH_TOKEN: ${{ github.token }}
+      shell: pwsh
+      run: 'Copy-Item LISEZ-MOI.txt dist/LISEZ-MOI.txt
+
+        Get-FileHash dist/toonworld.exe -Algorithm SHA256 | ForEach-Object { "$($_.Hash.ToLower())  toonworld.exe" } | Out-File dist/SHA256SUMS.txt -Encoding ascii
+
+        Compress-Archive -Path evidence/* -DestinationPath dist/Windows-verification.zip
+
+        cd dist
+
+        gh release create v166-windows --title ''Toonworld V166 pour Windows'' --notes-file LISEZ-MOI.txt --prerelease toonworld.exe LISEZ-MOI.txt SHA256SUMS.txt Windows-verification.zip
+
+        '
